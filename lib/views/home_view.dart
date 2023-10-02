@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notjusttodoapp/utilities/add_task_dialog.dart';
+import 'package:notjusttodoapp/utilities/filter_task_dialog.dart';
 import 'package:notjusttodoapp/views/all_tasks_view.dart';
 import 'package:notjusttodoapp/views/completed_tasks_view.dart';
 import 'package:notjusttodoapp/views/pending_tasks_view.dart';
@@ -28,16 +29,28 @@ class _MyHomePageState extends State<MyHomePage> {
           bottom: _selectedIndex == 0
               ? const TabBar(tabs: [
                   Tab(
-                    text: 'Completed',
+                    text: 'Pending',
                   ),
                   Tab(
-                    text: 'Pending',
+                    text: 'Completed',
                   ),
                   Tab(
                     text: 'All',
                   )
                 ])
               : null,
+              actions: _selectedIndex == 0
+              ?  <Widget>[
+                IconButton(onPressed: (){
+                  showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return const FilterTaskAlertDialog();
+              },
+            );
+                }, icon: const Icon(Icons.filter_alt_outlined))
+              ]
+              :null,
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
@@ -88,8 +101,8 @@ class _MyHomePageState extends State<MyHomePage> {
     switch (index) {
       case 0:
         return const TabBarView(children: [
-          CompletedTaskView(),
           PendingTasksView(),
+          CompletedTaskView(),
           AllTasksView()
         ]);
 

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:notjusttodoapp/provider/task_provider.dart';
 import 'package:provider/provider.dart';
+
+final List<String> taskCat = ['Work', 'Shopping', 'Other'];
 
 class AddTaskAlertDialog extends StatefulWidget {
   const AddTaskAlertDialog({super.key});
@@ -12,8 +15,7 @@ class AddTaskAlertDialog extends StatefulWidget {
 class _AddTaskAlertDialogState extends State<AddTaskAlertDialog> {
   final TextEditingController taskNameController = TextEditingController();
   final TextEditingController taskDescController = TextEditingController();
-  final List<String> taskCat = ['Work', 'Shopping', 'Other'];
-  String selectedValue = '';
+  String selectedValue = taskCat.first;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +26,7 @@ class _AddTaskAlertDialogState extends State<AddTaskAlertDialog> {
       title: const Text('New Task'),
       scrollable: true,
       content: SizedBox(
-        height: height * 0.55,
+        height: height * 0.35,
         width: width,
         child: Form(
           child: Column(
@@ -116,9 +118,14 @@ class _AddTaskAlertDialogState extends State<AddTaskAlertDialog> {
             Navigator.of(context, rootNavigator: true).pop();
           },
           style: ElevatedButton.styleFrom(
-            primary: Colors.grey,
+            backgroundColor: Theme.of(context).secondaryHeaderColor,
           ),
-          child: const Text('Cancel'),
+          child: Text(
+            'Cancel',
+            style: TextStyle(
+              color: Theme.of(context).primaryColorDark,
+            ),
+          ),
         ),
         ElevatedButton(
           onPressed: () async {
@@ -152,7 +159,16 @@ class _AddTaskAlertDialogState extends State<AddTaskAlertDialog> {
                   }));
             }
           },
-          child: const Text('Save'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Theme.of(context)
+                .primaryColor, // This sets the button color based on the theme
+          ),
+          child: Text(
+            'Save',
+            style: TextStyle(
+              color: Theme.of(context).secondaryHeaderColor,
+            ),
+          ),
         ),
       ],
     );
@@ -161,6 +177,12 @@ class _AddTaskAlertDialogState extends State<AddTaskAlertDialog> {
   addTask(String taskName, String taskDesc, String taskCat) {
     Provider.of<TaskProvider>(context, listen: false)
         .addTask(taskName, taskDesc, taskCat);
+
+    Fluttertoast.showToast(
+      msg: "Task added successfully",
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.SNACKBAR,
+    );
   }
 
   void _clearAll() {

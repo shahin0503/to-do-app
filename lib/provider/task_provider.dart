@@ -22,8 +22,10 @@ class TaskProvider extends ChangeNotifier {
       )
       .toList();
 
-  void addTask(taskName, taskDesc, taskCat) {
+   addTask(taskName, taskDesc, taskCat) {
+    int id = _tasks.length;
     _tasks.add(TaskModel(
+      id: id,
         taskName: taskName,
         taskDesc: taskDesc,
         taskCat: taskCat,
@@ -42,10 +44,10 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateTask(TaskModel task) {
-    final taskIndex = _tasks.indexOf(task);
+  void updateTask(TaskModel updatedTask) {
+    final taskIndex = _tasks.indexWhere((element) => element.taskName == updatedTask.taskName);
     if (taskIndex != -1) {
-      _tasks[taskIndex] = task;
+      _tasks[taskIndex] = updatedTask;
       notifyListeners();
     }
   }

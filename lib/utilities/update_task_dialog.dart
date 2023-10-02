@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:notjusttodoapp/models/task_model.dart';
 import 'package:notjusttodoapp/provider/task_provider.dart';
 import 'package:provider/provider.dart';
 
+final List<String> taskCat = ['Work', 'Shopping', 'Other'];
+
 class UpdateTaskAlertDialog extends StatefulWidget {
+  final int id;
   final String taskName, taskDesc, taskCat;
-  const UpdateTaskAlertDialog(
-      {super.key,
-      required this.taskName,
-      required this.taskDesc,
-      required this.taskCat});
+  const UpdateTaskAlertDialog({
+    super.key,
+    required this.id,
+    required this.taskName,
+    required this.taskDesc,
+    required this.taskCat,
+  });
 
   @override
   State<UpdateTaskAlertDialog> createState() => _UpdateTaskAlertDialogState();
@@ -18,13 +24,13 @@ class UpdateTaskAlertDialog extends StatefulWidget {
 class _UpdateTaskAlertDialogState extends State<UpdateTaskAlertDialog> {
   final TextEditingController taskNameController = TextEditingController();
   final TextEditingController taskDescController = TextEditingController();
-  final List<String> taskCat = ['Work', 'Shopping', 'Other'];
-  String selectedValue = '';
+  late String selectedValue;
 
   @override
   Widget build(BuildContext context) {
     taskNameController.text = widget.taskName;
     taskDescController.text = widget.taskDesc;
+    selectedValue = widget.taskCat;
 
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
@@ -33,7 +39,7 @@ class _UpdateTaskAlertDialogState extends State<UpdateTaskAlertDialog> {
       title: const Text('Edit Task'),
       scrollable: true,
       content: SizedBox(
-        height: height * 0.55,
+        height: height * 0.35,
         width: width,
         child: Form(
           child: Column(
@@ -125,22 +131,23 @@ class _UpdateTaskAlertDialogState extends State<UpdateTaskAlertDialog> {
             Navigator.of(context, rootNavigator: true).pop();
           },
           style: ElevatedButton.styleFrom(
-            primary: Colors.grey,
+            backgroundColor: Theme.of(context).secondaryHeaderColor,
           ),
-          child: const Text('Cancel'),
+          child:  Text('Cancel', style: TextStyle(
+            color: Theme.of(context).primaryColorDark,
+          ),),
         ),
         ElevatedButton(
           onPressed: () async {
+            final id = widget.id;
             final taskName = taskNameController.text;
             final taskDesc = taskDescController.text;
             final taskCat = selectedValue;
 
             if ((taskName.isNotEmpty && taskDesc.isNotEmpty)) {
-              await updateTask(taskName, taskDesc, taskCat);
+              await updateTask(id, taskName, taskDesc, taskCat);
 
               Navigator.of(context, rootNavigator: true).pop();
-
-              _clearAll();
             } else {
               showDialog(
                   context: context,
@@ -161,23 +168,30 @@ class _UpdateTaskAlertDialogState extends State<UpdateTaskAlertDialog> {
                   }));
             }
           },
-          child: const Text('Edit'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Theme.of(context).primaryColor,
+          ),
+          child: Text('Edit', style: TextStyle(
+            color: Theme.of(context).secondaryHeaderColor
+          ),),
         ),
       ],
     );
   }
 
-  updateTask(String taskName, String taskDesc, String taskCat) {
+  updateTask(int id, String taskName, String taskDesc, String taskCat) {
     TaskModel updatedTask = TaskModel(
+      id: id,
       taskName: taskName,
       taskDesc: taskDesc,
       taskCat: taskCat,
     );
     Provider.of<TaskProvider>(context, listen: false).updateTask(updatedTask);
-  }
 
-  void _clearAll() {
-    taskNameController.text = '';
-    taskDescController.text = '';
+    Fluttertoast.showToast(
+      msg: "Task updated successfully",
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.SNACKBAR,
+    );
   }
 }
